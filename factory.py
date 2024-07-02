@@ -1,0 +1,96 @@
+"""
+factory.py
+
+integrated with APM tracing
+"""
+
+from langchain_core.runnables import RunnablePassthrough
+from langchain_core.output_parsers import StrOutputParser
+
+from py_zipkin.zipkin import zipkin_span
+
+# these are the extension to add APM tracing
+from oci_embeddings_4_apm import OCIGenAIEmbeddingsWithBatch
+from chatocigenai_4_apm import ChatOCIGenAI4APM
+from factory_vector_store import get_vector_store
+from prompts_library import QA_PROMPT
+from utils import load_configuration, get_console_logger, format_docs
+
+from config_private import COMPARTMENT_ID
+
+config = load_configuration()
+SERVICE_NAME = "Factory"
+VERBOSE = config["general"]["verbose"]
+
+logger = get_console_logger()
+
+
+def get_embed_model(model_type="OCI"):
+    """
+    get the Embeddings Model
+    """
+
+    embed_model = None
+
+    if model_type == "OCI":
+        embed_model = OCIGenAIEmbeddingsWithBatch(
+            auth_type="API_KEY",
+            model_id=config["embeddings"]["oci"]["embed_model"],
+            service_endpoint=config["embeddings"]["oci"]["embed_endpoint"],
+            compartment_id=COMPARTMENT_ID,
+        )
+    return embed_model
+
+
+def get_llm(model_type="OCI"):
+    """
+    Build and return the LLM client
+    """
+
+    max_tokens = config["llm"]["max_tokens"]
+    temperature = config["llm"]["temperature"]
+
+    llm = None
+
+    if model_type == "OCI":
+        model_id = config["llm"]["oci"]["llm_model"]
+
+        if VERBOSE:
+            logger.info("%s as ChatModel...", model_id)
+
+        llm = ChatOCIGenAI4APM(
+            model_id=model_id,
+            service_endpoint=config["llm"]["oci"]["endpoint"],
+            compartment_id=COMPARTMENT_ID,
+            is_stream=True,
+            model_kwargs={"temperature": temperature, "max_tokens": max_tokens},
+        )
+
+    return llm
+
+
+@zipkin_span(service_name=SERVICE_NAME, span_name="build_rag_chain")
+def build_rag_chain():
+    """
+    build the entire rag chain with Langchain LCEL
+    """
+    embed_model = get_embed_model()
+
+    v_store = get_vector_store(vector_store_type="23AI", embed_model=embed_model)
+
+    # num of docs returned from semantic search
+    top_k = config["retriever"]["top_k"]
+
+    retriever = v_store.as_retriever(search_kwargs={"k": top_k})
+
+    chat_model = get_llm()
+
+    # using prompt defined in prompt_library
+    rag_chain = (
+        {"context": retriever | format_docs, "question": RunnablePassthrough()}
+        | QA_PROMPT
+        | chat_model
+        | StrOutputParser()
+    )
+
+    return rag_chain
