@@ -36,6 +36,7 @@ conversations: Dict[str, List[BaseMessage]] = {}
 
 config = load_configuration()
 SERVICE_NAME = "DemoGenAIAPM"
+VERBOSE = config["general"]["verbose"]
 
 logger = get_console_logger()
 
@@ -79,6 +80,13 @@ def add_message(conv_id, msg):
     conversation = conversations[conv_id]
     # add the msg
     conversation.append(msg)
+
+    # to keep only MAX_NUM_MSGS in the conversation
+    if len(conversation) > config["general"]["conv_max_msgs"]:
+        if VERBOSE:
+            logger.info("Removing old msg from conversation id: %s", conv_id)
+        # remove first (older) el from conversation
+        conversation.pop(0)
 
 
 def get_conversation(v_conv_id):
