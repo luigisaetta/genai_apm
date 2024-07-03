@@ -101,12 +101,14 @@ def invoke(request: InvokeInput, conv_id: str):
             span.update_binary_annotations({"genai-chat-input": request.query})
 
         response = handle_request(request, conv_id)
+        # only the text of the response
+        answer = response["answer"]
 
         if detailed_tracing:
             # add output
-            span.update_binary_annotations({"genai-chat-output": response})
+            span.update_binary_annotations({"genai-chat-output": answer})
 
-    return Response(content=response["answer"], media_type=MEDIA_TYPE_NOSTREAM)
+    return Response(content=answer, media_type=MEDIA_TYPE_NOSTREAM)
 
 
 if __name__ == "__main__":
