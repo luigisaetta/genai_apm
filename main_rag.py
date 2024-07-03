@@ -55,7 +55,7 @@ class InvokeInput(BaseModel):
 
 def handle_request(request: InvokeInput, conv_id: str):
     """
-    handle the request from answer
+    handle the request from invoke
     """
     # build_rag_chain mark a span (see: factory)
     chain = build_rag_chain()
@@ -67,7 +67,8 @@ def handle_request(request: InvokeInput, conv_id: str):
         transport_handler=http_transport,
         encoding=Encoding.V2_JSON,
     ):
-        output = chain.invoke(request.query)
+        # for now no chat history passed
+        output = chain.invoke({"input": request.query, "chat_history": []})
 
     return output
 
@@ -105,7 +106,7 @@ def invoke(request: InvokeInput, conv_id: str):
             # add output
             span.update_binary_annotations({"genai-chat-output": response})
 
-    return Response(content=response, media_type=MEDIA_TYPE_NOSTREAM)
+    return Response(content=response["answer"], media_type=MEDIA_TYPE_NOSTREAM)
 
 
 if __name__ == "__main__":

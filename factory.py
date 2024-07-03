@@ -4,8 +4,9 @@ factory.py
 integrated with APM tracing
 """
 
-from langchain_core.runnables import RunnablePassthrough
-from langchain_core.output_parsers import StrOutputParser
+from langchain.chains import create_history_aware_retriever
+from langchain.chains import create_retrieval_chain
+from langchain.chains.combine_documents import create_stuff_documents_chain
 
 from py_zipkin.zipkin import zipkin_span
 
@@ -13,8 +14,8 @@ from py_zipkin.zipkin import zipkin_span
 from oci_embeddings_4_apm import OCIGenAIEmbeddingsWithBatch
 from chatocigenai_4_apm import ChatOCIGenAI4APM
 from factory_vector_store import get_vector_store
-from prompts_library import QA_PROMPT
-from utils import load_configuration, get_console_logger, format_docs
+from prompts_library import CONTEXT_Q_PROMPT, QA_PROMPT
+from utils import load_configuration, get_console_logger
 
 from config_private import COMPARTMENT_ID
 
@@ -86,11 +87,12 @@ def build_rag_chain():
     chat_model = get_llm()
 
     # using prompt defined in prompt_library
-    rag_chain = (
-        {"context": retriever | format_docs, "question": RunnablePassthrough()}
-        | QA_PROMPT
-        | chat_model
-        | StrOutputParser()
+    # 3/07 modified for chat interface
+    history_aware_retriever = create_history_aware_retriever(
+        chat_model, retriever, CONTEXT_Q_PROMPT
     )
+    question_answer_chain = create_stuff_documents_chain(chat_model, QA_PROMPT)
+
+    rag_chain = create_retrieval_chain(history_aware_retriever, question_answer_chain)
 
     return rag_chain
