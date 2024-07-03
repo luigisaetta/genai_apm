@@ -123,6 +123,9 @@ def handle_request(request: InvokeInput, conv_id: str):
     return ai_msg
 
 
+#
+# HTTP API methods
+#
 @app.post("/invoke/", tags=["V1"])
 def invoke(request: InvokeInput, conv_id: str):
     """
@@ -159,6 +162,21 @@ def invoke(request: InvokeInput, conv_id: str):
             span.update_binary_annotations({"genai-chat-output": answer})
 
     return Response(content=answer, media_type=MEDIA_TYPE_NOSTREAM)
+
+
+# to clean up a conversation
+@app.delete("/delete/", tags=["V1"])
+def delete(conv_id: str):
+    """
+    delete a conversation
+    """
+    logger.info("Called delete, conv_id: %s...", conv_id)
+
+    if conv_id not in conversations:
+        raise HTTPException(status_code=404, detail="Conversation not found!")
+
+    del conversations[conv_id]
+    return {"conv_id": conv_id, "messages": []}
 
 
 if __name__ == "__main__":
