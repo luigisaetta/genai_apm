@@ -16,6 +16,7 @@ apm_content_type = "application/json"
 
 # logs to APM input/output in addition to timings
 detailed_tracing = true
+sample_rate = 100
 
 
 [embeddings]
@@ -44,6 +45,6 @@ top_p = 1
 # FRA
 endpoint = "https://inference.generativeai.eu-frankfurt-1.oci.oraclecloud.com"
 
-# llm_model = "cohere.command-r-16k"
+llm_model = "cohere.command-r-16k"
 # llm_model = "cohere.command-r-plus"
-llm_model = "meta.llama-3-70b-instruct"
+# llm_model = "meta.llama-3-70b-instruct"

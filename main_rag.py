@@ -4,6 +4,7 @@ RAG REST API
 to test APM integration
 """
 
+from typing import List, Dict
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -13,6 +14,7 @@ from pydantic import BaseModel
 from py_zipkin import Encoding
 from py_zipkin.zipkin import zipkin_span
 
+from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
 from factory import build_rag_chain
 
 # customized transport
@@ -27,6 +29,10 @@ MEDIA_TYPE_NOSTREAM_JSON = "application/json"
 # Main
 #
 app = FastAPI()
+
+# global Object to handle conversation history
+# key is conv_id
+conversations: Dict[str, List[BaseMessage]] = {}
 
 config = load_configuration()
 SERVICE_NAME = "DemoGenAIAPM"
@@ -53,6 +59,40 @@ class InvokeInput(BaseModel):
     query: str
 
 
+#
+# supporting functions to manage the conversation
+# history (add, get)
+#
+def add_message(conv_id, msg):
+    """
+    add a msg to a conversation.
+    If the conversation doesn't exist create it
+
+    msg: can be HumanMessage, AIMessage
+    """
+
+    if conv_id not in conversations:
+        # create it
+        conversations[conv_id] = []
+
+    # identify the conversation
+    conversation = conversations[conv_id]
+    # add the msg
+    conversation.append(msg)
+
+
+def get_conversation(v_conv_id):
+    """
+    return a conversation as List[BaseMessage]
+    """
+    if v_conv_id not in conversations:
+        conversation = []
+    else:
+        conversation = conversations[v_conv_id]
+
+    return conversation
+
+
 def handle_request(request: InvokeInput, conv_id: str):
     """
     handle the request from invoke
@@ -67,10 +107,20 @@ def handle_request(request: InvokeInput, conv_id: str):
         transport_handler=http_transport,
         encoding=Encoding.V2_JSON,
     ):
-        # for now no chat history passed
-        output = chain.invoke({"input": request.query, "chat_history": []})
+        # get the chat history
+        conversation = get_conversation(conv_id)
 
-    return output
+        #
+        # call the RAG chain
+        #
+        ai_msg = chain.invoke({"input": request.query, "chat_history": conversation})
+
+        # update the conversation
+        add_message(conv_id, HumanMessage(content=request.query))
+        # output is an AI message
+        add_message(conv_id, AIMessage(content=ai_msg["answer"]))
+
+    return ai_msg
 
 
 @app.post("/invoke/", tags=["V1"])
