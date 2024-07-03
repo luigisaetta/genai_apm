@@ -43,7 +43,7 @@ app.add_middleware(
 )
 
 
-class Message(BaseModel):
+class InvokeInput(BaseModel):
     """
     class for the body of the request
 
@@ -53,7 +53,7 @@ class Message(BaseModel):
     query: str
 
 
-def handle_request(request: Message, conv_id: str):
+def handle_request(request: InvokeInput, conv_id: str):
     """
     handle the request from answer
     """
@@ -72,8 +72,8 @@ def handle_request(request: Message, conv_id: str):
     return output
 
 
-@app.post("/answer/", tags=["V1"])
-def answer(request: Message, conv_id: str):
+@app.post("/invoke/", tags=["V1"])
+def invoke(request: InvokeInput, conv_id: str):
     """
     This function handle the HTTP request
 
@@ -87,7 +87,7 @@ def answer(request: Message, conv_id: str):
     #
     with zipkin_span(
         service_name=SERVICE_NAME,
-        span_name="answer",
+        span_name="rag_invoke",
         transport_handler=http_transport,
         encoding=Encoding.V2_JSON,
         binary_annotations={"conv_id": conv_id},

@@ -5,6 +5,7 @@ for integration with APM
 from typing import Any, List
 
 from langchain_core.runnables.config import RunnableConfig
+from langchain_core.messages import BaseMessage
 from langchain_core.language_models import LanguageModelInput
 from langchain_community.chat_models import ChatOCIGenAI
 
@@ -33,7 +34,7 @@ class ChatOCIGenAI4APM(ChatOCIGenAI):
         *,
         stop: List[str] | None = None,
         **kwargs: Any
-    ):
+    ) -> BaseMessage:
         # here we call the ChatModel
         output = super().invoke(input, config=config, stop=stop, **kwargs)
 
