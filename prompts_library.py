@@ -46,7 +46,7 @@ QA_PROMPT = ChatPromptTemplate.from_messages(
 
 QA_SYSTEM_PROMPT_IT = """Sei un assistente per task di domanda-risposta. \
 Utilizza i frammenti seguenti di testo per rispondere alla domanda. \
-Se non conosci la risposta, dici semplicemente che non conosci la risposta \
+Se non conosci la risposta, dici semplicemente che non conosci la risposta. \
 
 {context}"""
 

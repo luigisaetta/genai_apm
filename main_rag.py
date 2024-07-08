@@ -19,7 +19,7 @@ from factory import build_rag_chain
 
 # customized transport
 from transport import http_transport
-from utils import load_configuration, get_console_logger
+from utils import load_configuration, get_console_logger, sanitize_parameter
 
 # constants
 MEDIA_TYPE_NOSTREAM = "text/plain"
@@ -78,6 +78,7 @@ def add_message(conv_id, msg):
 
     # identify the conversation
     conversation = conversations[conv_id]
+
     # add the msg
     conversation.append(msg)
 
@@ -142,6 +143,9 @@ def invoke(request: InvokeInput, conv_id: str):
     conv_id: the id of the conversation, to handle chat_history
     """
 
+    # remove eventually any dangerous char
+    conv_id = sanitize_parameter(conv_id)
+
     detailed_tracing = config["apm_tracing"]["detailed_tracing"]
 
     #
@@ -161,13 +165,21 @@ def invoke(request: InvokeInput, conv_id: str):
             # add input
             span.update_binary_annotations({"genai-chat-input": request.query})
 
-        response = handle_request(request, conv_id)
-        # only the text of the response
-        answer = response["answer"]
+        try:
+            response = handle_request(request, conv_id)
 
-        if detailed_tracing:
-            # add output
-            span.update_binary_annotations({"genai-chat-output": answer})
+            # only the text of the response
+            answer = response["answer"]
+
+            if detailed_tracing:
+                # add output
+                span.update_binary_annotations({"genai-chat-output": answer})
+
+        except Exception as e:
+            # to signal error
+            span.update_binary_annotations({"error": "true"})
+            span.update_binary_annotations({"ErrorMessage": str(e)})
+            answer = f"Error: {str(e)}"
 
     return Response(content=answer, media_type=MEDIA_TYPE_NOSTREAM)
 
@@ -178,6 +190,8 @@ def delete(conv_id: str):
     """
     delete a conversation
     """
+    conv_id = sanitize_parameter(conv_id)
+
     logger.info("Called delete, conv_id: %s...", conv_id)
 
     if conv_id not in conversations:

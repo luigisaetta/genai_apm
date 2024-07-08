@@ -2,6 +2,7 @@
 Utils
 """
 
+import re
 import logging
 import toml
 
@@ -46,3 +47,19 @@ def load_configuration():
         config = toml.load(file)
 
     return config
+
+
+def sanitize_parameter(param):
+    """
+    the function sanitize the params input to the REST API
+
+    for now used for conv_id
+
+    could we make it better?
+    """
+    # Whitelist: alphanumeric characters and a few special characters
+    whitelist = re.compile(r"[^a-zA-Z0-9._\-]")
+    # Replace any character not in the whitelist with an empty string
+    sanitized_param = re.sub(whitelist, "", param)
+
+    return sanitized_param
