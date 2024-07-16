@@ -43,7 +43,7 @@ def load_configuration():
     """
     read the configuration from toml file
     """
-    with open(CONFIG_FILE, "r") as file:
+    with open(CONFIG_FILE, "r", encoding="utf-8") as file:
         config = toml.load(file)
 
     return config

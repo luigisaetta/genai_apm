@@ -16,7 +16,7 @@ from py_zipkin.zipkin import zipkin_span
 
 from utils import load_configuration
 
-
+# convention: the name of the superclass
 SERVICE_NAME = "OCIGenAIEmbeddings"
 
 
@@ -36,7 +36,7 @@ class OCIGenAIEmbeddingsWithBatch(OCIGenAIEmbeddings):
     @zipkin_span(service_name=SERVICE_NAME, span_name="embed_documents")
     def embed_documents(self, texts):
         """
-        in addition to  integration with APM it also add bactching
+        in addition to  integration with APM it also add batching
         """
         batch_size = self.config["embeddings"]["oci"]["embed_batch_size"]
         embeddings = []

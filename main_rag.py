@@ -102,6 +102,13 @@ def get_conversation(v_conv_id):
     return conversation
 
 
+def active_conversations_count():
+    """
+    return the num of conversations not deleted
+    """
+    return len(conversations)
+
+
 def handle_request(request: InvokeInput, conv_id: str):
     """
     handle the request from invoke
@@ -182,6 +189,14 @@ def invoke(request: InvokeInput, conv_id: str):
             answer = f"Error: {str(e)}"
 
     return Response(content=answer, media_type=MEDIA_TYPE_NOSTREAM)
+
+
+@app.get("/count_conversations/", tags=["V1"])
+def count_conversations():
+    """
+    count the active conv
+    """
+    return active_conversations_count()
 
 
 # to clean up a conversation

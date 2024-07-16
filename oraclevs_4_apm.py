@@ -17,7 +17,7 @@ SERVICE_NAME = "OracleVS"
 
 class OracleVS4APM(OracleVS):
     """
-    Extension to add tracing vs APM
+    Subclass with extension to add tracing for APM
     """
 
     config = load_configuration()
