@@ -4,9 +4,11 @@
 
 [general]
 # setting this flag we get more information in the logs
-verbose = false
+verbose = true
 # port per l'api REST
 api_port = 8888
+# max_msg in conversation
+conv_max_msgs = 10
 
 [apm_tracing]
 # globally enable/disable tracing
@@ -27,7 +29,7 @@ embed_endpoint = "https://inference.generativeai.eu-frankfurt-1.oci.oraclecloud.
 embed_model = "cohere.embed-multilingual-v3.0"
 
 [vector_store]
-collection_name = "MY_BOOKS"
+collection_name = "ALL_BOOKS"
 
 [retriever]
 # # of docs retrieved by semantic search
