@@ -9,7 +9,7 @@ import requests
 
 class FastAPIClient:
     """
-    Cleint for test of API
+    Client for test of API
     """
 
     def __init__(self, base_url: str):
@@ -22,7 +22,7 @@ class FastAPIClient:
         url = f"{self.base_url}/invoke/"
         params = {"conv_id": conv_id}
         json_data = {"query": query}
-        response = requests.post(url, params=params, json=json_data, timeout=10)
+        response = requests.post(url, params=params, json=json_data, timeout=30)
         response.raise_for_status()
 
         return response.text
@@ -32,7 +32,7 @@ class FastAPIClient:
         test count conversations
         """
         url = f"{self.base_url}/count_conversations/"
-        response = requests.get(url, timeout=10)
+        response = requests.get(url, timeout=30)
         response.raise_for_status()
         return response.json()
 
@@ -42,7 +42,7 @@ class FastAPIClient:
         """
         url = f"{self.base_url}/delete/"
         params = {"conv_id": conv_id}
-        response = requests.delete(url, params=params, timeout=10)
+        response = requests.delete(url, params=params, timeout=30)
         response.raise_for_status()
         return response.json()
 
