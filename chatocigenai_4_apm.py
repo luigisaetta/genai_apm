@@ -1,5 +1,5 @@
 """
-for integration with APM
+For integration with APM
 """
 
 from typing import Any, List
@@ -21,7 +21,7 @@ logger = get_console_logger()
 
 class ChatOCIGenAI4APM(ChatOCIGenAI):
     """
-    extension for integration with APM
+    Extension for integration with Application Performance Monitoring (APM).
     """
 
     app_config = load_configuration()
@@ -35,11 +35,22 @@ class ChatOCIGenAI4APM(ChatOCIGenAI):
         stop: List[str] | None = None,
         **kwargs: Any
     ) -> BaseMessage:
-        # here we call the ChatModel
+        """
+        Invokes the ChatOCIGenAI model with APM integration.
+
+        Args:
+            input (LanguageModelInput): The input for the language model.
+            config (RunnableConfig, optional): Configuration for the run. Defaults to None.
+            stop (List[str], optional): List of stop words. Defaults to None.
+            **kwargs: Additional keyword arguments.
+
+        Returns:
+            BaseMessage: The output from the language model.
+        """
         output = super().invoke(input, config=config, stop=stop, **kwargs)
 
         if self.app_config["general"]["verbose"]:
-            # logs input/output to/from LLM
+            # Log input and output messages for debugging purposes
             for msg in input.messages:
                 logger.info("Input: %s", msg.content)
             logger.info("Output: %s", output.content)

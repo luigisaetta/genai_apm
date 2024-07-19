@@ -27,6 +27,15 @@ class OracleVS4APM(OracleVS):
         self, query: str, k: int = 4, filter: Dict[str, Any] | None = None, **kwargs
     ) -> List[Document]:
         """
-        to add tracing
+        Perform a similarity search with APM tracing.
+
+        Args:
+            query (str): The query string for the search.
+            k (int, optional): The number of top results to return. Defaults to 4.
+            filter (Dict[str, Any], optional): A filter to apply to the search. Defaults to None.
+            **kwargs: Additional keyword arguments.
+
+        Returns:
+            List[Document]: A list of documents that match the search criteria.
         """
         return super().similarity_search(query, k=k, filter=filter, **kwargs)
