@@ -3,7 +3,7 @@ Test API
 """
 
 import time
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 import requests
 
 
@@ -49,14 +49,14 @@ class FastAPIClient:
 
 if __name__ == "__main__":
 
-    base_url = "http://130.61.180.31:8888"
+    URL = "http://130.61.180.31:8888"
 
-    client = FastAPIClient(base_url)
+    client = FastAPIClient(URL)
 
-    # chiamata al metodo invoke
-    conv_id = "luigi04"
+    # prepare the simulation of conversation
+    CONV_ID = "luigi11"
 
-    queries = [
+    QUERIES = [
         "What is Oracle AI Vector Search?",
         "Has it do do with AI and LLM?",
         "Is it a feature of Oracle Database?",
@@ -65,14 +65,14 @@ if __name__ == "__main__":
     ]
 
     try:
-        for query in queries:
-            response = client.invoke(conv_id, query)
+        for query in QUERIES:
+            answer = client.invoke(CONV_ID, query)
 
             print("Query:", query)
-            print("Response: ", response)
+            print("Answer: ", answer)
             print("\n\n")
 
             time.sleep(1)
 
     except requests.HTTPError as e:
-        print(f"Errore durante la chiamata a invoke: {e}")
+        print(f"Error during call to invoke: {e}")
