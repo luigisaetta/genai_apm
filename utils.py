@@ -10,6 +10,7 @@ from langchain_core.documents.base import Document
 
 CONFIG_FILE = "config.toml"
 
+
 def format_docs(docs: List[Document]) -> str:
     """
     Format documents to be nicely presented in the prompt.
@@ -61,7 +62,7 @@ def load_configuration(config_file: str = CONFIG_FILE) -> dict:
         with open(config_file, "r", encoding="utf-8") as file:
             config = toml.load(file)
     except (FileNotFoundError, toml.TomlDecodeError) as e:
-        logging.error(f"Error loading configuration: {e}")
+        logging.error("Error loading configuration: %s", e)
         raise
 
     return config

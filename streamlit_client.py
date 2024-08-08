@@ -48,7 +48,7 @@ def invoke_api(conv_id, query):
     invoke the API (RAG)
     """
     response = requests.post(
-        INVOKE_URL, params={"conv_id": conv_id}, json={"query": query}
+        INVOKE_URL, params={"conv_id": conv_id}, json={"query": query}, timeout=60
     )
     return response.text
 
@@ -57,7 +57,7 @@ def delete_conversation(conv_id):
     """
     delete a conversation
     """
-    response = requests.delete(DELETE_URL, params={"conv_id": conv_id})
+    response = requests.delete(DELETE_URL, params={"conv_id": conv_id}, timeout=60)
     return response.json()
 
 
