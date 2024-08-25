@@ -20,6 +20,8 @@ config = load_configuration()
 #
 BASE_URL = config["apm_tracing"]["base_url"]
 APM_CONTENT_TYPE = config["apm_tracing"]["apm_content_type"]
+
+# this is the public endpoint we're calling
 APM_UPLOAD_ENDPOINT_URL = f"{BASE_URL}/observations/public-span?dataFormat=zipkin&dataFormatVersion=2&dataKey={APM_PUBLIC_KEY}"
 
 # in config.toml we can enable/disable globally tracing

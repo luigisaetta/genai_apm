@@ -33,6 +33,7 @@ def test_stream(the_llm, messages):
         transport_handler=http_transport,
         encoding=Encoding.V2_JSON,
         binary_annotations={"conv_id": "test01"},
+        # this way we're tracing 100% of requests
         sample_rate=100,
     ) as span:
         response = the_llm.stream(messages)
