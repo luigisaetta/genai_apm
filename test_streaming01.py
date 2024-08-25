@@ -37,9 +37,9 @@ def test_stream(the_llm, messages):
     ) as span:
         response = the_llm.stream(messages)
 
-    print("")
-    for chunk in response:
-        print(chunk.content, end="", flush=True)
+        print("")
+        for chunk in response:
+            print(chunk.content, end="", flush=True)
 
 
 #
