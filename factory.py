@@ -20,52 +20,49 @@ from utils import load_configuration, get_console_logger
 from config_private import COMPARTMENT_ID
 
 config = load_configuration()
+
 SERVICE_NAME = "Factory"
 VERBOSE = config["general"]["verbose"]
 
 logger = get_console_logger()
 
 
-def get_embed_model(model_type="OCI"):
+def get_embed_model():
     """
     get the Embeddings Model
     """
 
-    embed_model = None
+    embed_model = OCIGenAIEmbeddingsWithBatch(
+        auth_type="API_KEY",
+        model_id=config["embeddings"]["oci"]["embed_model"],
+        service_endpoint=config["embeddings"]["oci"]["embed_endpoint"],
+        compartment_id=COMPARTMENT_ID,
+    )
 
-    if model_type == "OCI":
-        embed_model = OCIGenAIEmbeddingsWithBatch(
-            auth_type="API_KEY",
-            model_id=config["embeddings"]["oci"]["embed_model"],
-            service_endpoint=config["embeddings"]["oci"]["embed_endpoint"],
-            compartment_id=COMPARTMENT_ID,
-        )
     return embed_model
 
 
-def get_llm(model_type="OCI"):
+def get_llm():
     """
     Build and return the LLM client
     """
 
+    model_id = config["llm"]["oci"]["llm_model"]
     max_tokens = config["llm"]["max_tokens"]
     temperature = config["llm"]["temperature"]
 
-    llm = None
+    if VERBOSE:
+        logger.info("%s as ChatModel...", model_id)
 
-    if model_type == "OCI":
-        model_id = config["llm"]["oci"]["llm_model"]
-
-        if VERBOSE:
-            logger.info("%s as ChatModel...", model_id)
-
-        llm = ChatOCIGenAI4APM(
-            model_id=model_id,
-            service_endpoint=config["llm"]["oci"]["endpoint"],
-            compartment_id=COMPARTMENT_ID,
-            is_stream=True,
-            model_kwargs={"temperature": temperature, "max_tokens": max_tokens},
-        )
+    llm = ChatOCIGenAI4APM(
+        # this example uses api_key
+        auth_type="API_KEY",
+        model_id=model_id,
+        service_endpoint=config["llm"]["oci"]["endpoint"],
+        compartment_id=COMPARTMENT_ID,
+        is_stream=True,
+        model_kwargs={"temperature": temperature, "max_tokens": max_tokens},
+    )
 
     return llm
 

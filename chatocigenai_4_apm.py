@@ -56,3 +56,29 @@ class ChatOCIGenAI4APM(ChatOCIGenAI):
             logger.info("Output: %s", output.content)
 
         return output
+
+    @zipkin_span(service_name=SERVICE_NAME, span_name="stream")
+    def stream(
+        self,
+        input: LanguageModelInput,
+        config: RunnableConfig | None = None,
+        *,
+        stop: List[str] | None = None,
+        **kwargs: Any
+    ):
+        """
+        Invokes the ChatOCIGenAI model with APM integration.
+
+        Args:
+            input (LanguageModelInput): The input for the language model.
+            config (RunnableConfig, optional): Configuration for the run. Defaults to None.
+            stop (List[str], optional): List of stop words. Defaults to None.
+            **kwargs: Additional keyword arguments.
+
+        Returns:
+            stream generator
+        """
+
+        generator = super().stream(input, config=config, stop=stop, **kwargs)
+
+        return generator

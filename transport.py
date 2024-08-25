@@ -15,6 +15,8 @@ config = load_configuration()
 
 #
 # configs for zipkin transport
+# see notes here:
+# https://docs.oracle.com/en-us/iaas/application-performance-monitoring/doc/configure-open-source-tracing-systems.html
 #
 BASE_URL = config["apm_tracing"]["base_url"]
 APM_CONTENT_TYPE = config["apm_tracing"]["apm_content_type"]

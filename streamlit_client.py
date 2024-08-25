@@ -7,8 +7,8 @@ import requests
 from langchain_core.messages import HumanMessage, AIMessage
 
 # Configura la tua API endpoint
-INVOKE_URL = "http://130.61.180.31:8888/invoke/"
-DELETE_URL = "http://130.61.180.31:8888/delete/"
+INVOKE_URL = "http://localhost:8888/invoke/"
+DELETE_URL = "http://localhost:8888/delete/"
 
 # Constant
 USER = "user"
