@@ -1,5 +1,5 @@
 # OCI Generative AI and OCI APM integration
-This repo contains the code for the integration between a **Generative AI** application based on LangChain and **OCI Application Performance Management**
+This repo contains the code for the integration between a **RAG Generative AI** application based on LangChain and **OCI Application Performance Management**
 
 The integration is based on **py-zipkin**
 
